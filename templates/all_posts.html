@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Posts</title>
+    <style>
+        form { margin-bottom: 20px; }
+        label, input, textarea, button { display: block; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>Edit Posts</h1>
+
+    <ul>
+        {% for post in posts %}
+            <li>
+                <form action="/posts/{{ post.id }}/edit" method="post">
+                    <label for="title-{{ post.id }}">Title:</label>
+                    <input type="text" id="title-{{ post.id }}" name="title" value="{{ post.title }}" required>
+                    
+                    <label for="content-{{ post.id }}">Content:</label>
+                    <textarea id="content-{{ post.id }}" name="content" required>{{ post.content }}</textarea>
+                    
+                    <label for="user_id-{{ post.id }}">User ID:</label>
+                    <input type="number" id="user_id-{{ post.id }}" name="user_id" value="{{ post.user_id }}" required>
+                    
+                    <button type="submit">Save Changes</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
