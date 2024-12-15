@@ -1,3 +1,7 @@
+"""
+Основной модуль для настройки базы данных и определения моделей.
+"""
+
 from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
@@ -8,8 +12,10 @@ DATABASE_URL = "postgresql+psycopg2://postgres:Memento227@192.168.56.1:5432/post
 engine = create_engine(DATABASE_URL)
 Base = declarative_base()
 
-# Определение модели Users
 class User(Base):
+    """
+    Модель таблицы 'users' в базе данных.
+    """
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, unique=True, nullable=False)
@@ -17,8 +23,10 @@ class User(Base):
     password = Column(String, nullable=False)
     posts = relationship("Post", back_populates="author")
 
-# Определение модели Posts
 class Post(Base):
+    """
+    Модель таблицы 'posts' в базе данных.
+    """
     __tablename__ = 'posts'
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
