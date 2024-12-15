@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD FastAPI</title>
+    <style>
+        form { margin-bottom: 20px; }
+        label, input, textarea, button { display: block; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>User and Post Management</h1>
+
+    <!-- Форма для добавления пользователя -->
+    <form id="add-user-form">
+        <h2>Add User</h2>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="button" onclick="addUser()">Add User</button>
+    </form>
+
+    <title>All Users</title>
+    <body>
+        <h1>All Users</h1>
+        <ul>
+            {% for user in users %}
+                <li>
+                    {{ user.username }} ({{ user.email }}) - User ID: {{ user.id }}
+                    <button onclick="deleteUser('{{ user.id }}')">Delete</button>
+                </li>
+            {% endfor %}
+        </ul>
+    </body>
+    
+    <script>
+        async function deleteUser(userId) {
+            const response = await fetch(`/users/${userId}/`, {
+                method: 'DELETE',
+            });
+    
+            if (response.ok) {
+                alert('User deleted successfully!');
+                loadUsers(); // Обновление списка пользователей
+            } else {
+                alert('Failed to delete user.');
+            }
+        }
+    
+        async function loadUsers() {
+            const response = await fetch('/users/');
+            const users = await response.json();
+            const usersList = document.querySelector('ul');
+            usersList.innerHTML = '';
+            users.forEach(user => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `${user.username} (${user.email}) <button onclick="deleteUser(${user.id})">Delete</button>`;
+                usersList.appendChild(listItem);
+            });
+        }
+    
+        loadUsers();
+    </script>
+    </body>
+
+    <!-- Форма для обновления email -->
+    <form id="update-email-form">
+        <h2>Update User Email</h2>
+        <label for="user-id">User ID:</label>
+        <input type="number" id="user-id" name="user_id" required>
+        <label for="new-email">New Email:</label>
+        <input type="email" id="new-email" name="new_email" required>
+        <button type="button" onclick="updateEmail()">Update Email</button>
+    </form>
+
+    <!-- Форма для добавления поста -->
+<form id="add-post-form">
+    <h2>Add Post</h2>
+    <label for="post-id">Post ID (optional):</label>
+    <input type="number" id="post-id" name="post_id" placeholder="Leave empty to auto-generate">
+    <label for="post-title">Title:</label>
+    <input type="text" id="post-title" name="title" required>
+    <label for="post-content">Content:</label>
+    <textarea id="post-content" name="content" required></textarea>
+    <label for="post-user-id">User ID:</label>
+    <input type="number" id="post-user-id" name="user_id" required>
+    <button type="button" onclick="addPost()">Add Post</button>
+</form>
+
+
+    <title>All Posts</title>
+    <body>
+        <h1>All Posts</h1>
+        <ul>
+            {% for post in posts %}
+                <li>
+                    <strong>{{ post.title }}</strong>: {{ post.content }} (User ID: {{ post.user_id }})
+                    <button onclick="deletePost('{{ post.id }}')">Delete</button>
+                </li>
+            {% endfor %}
+        </ul>
+    </body>
+    
+    <script>
+        async function deletePost(postId) {
+            const response = await fetch(`/posts/${postId}/`, {
+                method: 'DELETE',
+            });
+    
+            if (response.ok) {
+                alert('Post deleted successfully!');
+                loadPosts(); // Обновление списка постов
+            } else {
+                alert('Failed to delete post.');
+            }
+        }
+    
+        async function loadPosts() {
+            const response = await fetch('/posts/');
+            const posts = await response.json();
+            const postsList = document.querySelector('ul');
+            postsList.innerHTML = '';
+            posts.forEach(post => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<strong>${post.title}</strong>: ${post.content} (User ID: ${post.user_id})
+            <button onclick="deletePost(${post.id})">Delete</button>`;
+                postsList.appendChild(listItem);
+            });
+        }
+    
+        loadPosts();
+    </script>
+    </body>
+
+    <script>
+        // Функции для работы с пользователями и постами
+        async function loadUsers() {
+            const response = await fetch('/users/');
+            const users = await response.json();
+            const usersList = document.getElementById('users-list');
+            usersList.innerHTML = '';
+            users.forEach(user => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${user.username} (${user.email})`;
+                usersList.appendChild(listItem);
+            });
+        }
+
+        async function addUser() {
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('/users/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password }),
+            });
+
+            if (response.ok) {
+                alert('User added successfully!');
+                document.getElementById('add-user-form').reset();
+                loadUsers();
+            } else {
+                alert('Failed to add user.');
+            }
+        }
+
+        async function updateEmail() {
+            const userId = document.getElementById('user-id').value;
+            const newEmail = document.getElementById('new-email').value;
+
+            const response = await fetch(`/users/${userId}/email/`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ new_email: newEmail }),
+            });
+
+            if (response.ok) {
+                alert('Email updated successfully!');
+                loadUsers();
+            } else {
+                alert('Failed to update email.');
+            }
+        }
+
+        async function loadPosts() {
+            const response = await fetch('/posts/');
+            const posts = await response.json();
+            const postsList = document.getElementById('posts-list');
+            postsList.innerHTML = '';
+            posts.forEach(post => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${post.title} by User ID ${post.user_id}`;
+                postsList.appendChild(listItem);
+            });
+        }
+
+        async function addPost() {
+            const postId = document.getElementById('post-id').value || null;
+            const title = document.getElementById('post-title').value;
+            const content = document.getElementById('post-content').value;
+            const userId = document.getElementById('post-user-id').value;
+
+            const response = await fetch('/posts/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, content, user_id: userId }),
+            });
+
+            if (response.ok) {
+                alert('Post added successfully!');
+                document.getElementById('add-post-form').reset();
+                loadPosts();
+            } else {
+                alert('Failed to add post.');
+            }
+        }
+
+        loadUsers();
+        loadPosts();
+    </script>
+</body>
+</html>
+
+
